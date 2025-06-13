@@ -2,7 +2,22 @@ import unittest
 
 from functions.get_file_content import get_file_content
 from functions.get_files_info import get_files_info
+from functions.run_python import run_python_file
 from functions.write_file import write_file
+
+
+class TestRunPython(unittest.TestCase):
+    def run_python_file_main(self):
+        print(run_python_file("calculator", "main.py"))
+
+    def run_python_file_tests(self):
+        print(run_python_file("calculator", "tests.py"))
+
+    def test_run_python_file_outside_dir(self):
+        print(run_python_file("calculator", "../main.py"))
+
+    def test_run_python_file_nonexistent(self):
+        print(run_python_file("calculator", "nonexistent.py"))
 
 
 class TestWriteFile(unittest.TestCase):
