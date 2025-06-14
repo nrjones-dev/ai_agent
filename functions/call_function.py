@@ -1,5 +1,6 @@
 from google.genai import types
 
+from config import WORKING_DIR
 from functions.get_file_content import get_file_content
 from functions.get_files_info import get_files_info
 from functions.run_python import run_python_file
@@ -20,7 +21,7 @@ def call_function(function_call_item, verbose=False):
         "run_python_file": run_python_file,
         "write_file": write_file,
     }
-    keyword_args = {**function_args} | {"working_directory": "./calculator"}
+    keyword_args = {**function_args} | {"working_directory": WORKING_DIR}
 
     if function_name not in available_functions:
         return types.Content(

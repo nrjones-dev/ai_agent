@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+from config import MAX_CALLS
 from function_schema import available_functions
 from functions.call_function import call_function
 from prompts import SYSTEM_PROMPT
@@ -29,7 +30,24 @@ def main():
 
     messages = [types.Content(role="user", parts=[types.Part(text=input_prompt)])]
 
-    generate_content(client, messages, verbose)
+    for i in range(MAX_CALLS):
+        response = generate_content(client, messages, verbose)
+
+        if response.candidates:
+            for candidate in response.candidates:
+                messages.append(candidate.content)
+
+        try:
+            if response.function_calls:
+                function_call_result = call_function(response.function_calls[0])
+                messages.append(function_call_result)
+                if i < MAX_CALLS - 1:
+                    continue
+        except Exception as e:
+            print(f"Error generating content: {e}")
+
+        print("Final Response:", response.text)
+        break
 
 
 def generate_content(client, messages, verbose):
@@ -43,12 +61,7 @@ def generate_content(client, messages, verbose):
         print("Prompt tokens: ", response.usage_metadata.prompt_token_count)
         print("Response tokens: ", response.usage_metadata.candidates_token_count)
 
-    if response.function_calls:
-        function_call_result = call_function(response.function_calls[0])
-        print(f"Calling function: {response.function_calls[0].name}({response.function_calls[0].args})")
-        print(f"-> {function_call_result.parts[0].function_response.response}")  # type: ignore
-    else:
-        print("Response:", response.text)
+    return response
 
 
 if __name__ == "__main__":
