@@ -1,6 +1,8 @@
 import os
 import subprocess
 
+from google.genai import types
+
 
 def run_python_file(working_directory, filepath):
     abs_working_dir = os.path.abspath(working_directory)
@@ -15,9 +17,7 @@ def run_python_file(working_directory, filepath):
 
     try:
         args = ["python3", abs_filepath]
-        result = subprocess.run(
-            args, capture_output=True, timeout=30, text=True, cwd=abs_working_dir
-        )
+        result = subprocess.run(args, capture_output=True, timeout=30, text=True, cwd=abs_working_dir)
         result_output = []
 
         if result.stdout:
@@ -31,3 +31,18 @@ def run_python_file(working_directory, filepath):
         return "\n".join(result_output) if result_output else "No output produced."
     except Exception as e:
         return f"Error: executing python file: {e}"
+
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="runs a python file and returns the stdout and stderr, locked to files within working directory",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "filepath": types.Schema(
+                type=types.Type.STRING,
+                description="The filepath of the chosen python file, relative to the working directory.",
+            )
+        },
+    ),
+)
