@@ -35,7 +35,7 @@ def main():
 
         if response.candidates:
             for candidate in response.candidates:
-                messages.append(candidate.content)
+                messages.append(candidate.content)  # type: ignore
 
         try:
             if response.function_calls:
